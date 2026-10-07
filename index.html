@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AUTOFiX — автосервис: ремонт, диагностика, обслуживание</title>
+  <meta name="description" content="AUTOFiX — современный автосервис. Ремонт, компьютерная диагностика и техническое обслуживание автомобилей.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. ШАПКА -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#top" class="logo" aria-label="AUTOFiX — на главную">AUTO<span>FiX</span></a>
+
+      <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="nav" aria-label="Основная навигация">
+        <a href="#services">Услуги</a>
+        <a href="#advantages">Преимущества</a>
+        <a href="#gallery">Галерея</a>
+        <a href="#contacts">Контакты</a>
+        <a href="#contacts" class="btn btn--small">Записаться</a>
+      </nav>
+    </div>
+    <div class="ornament" aria-hidden="true"></div>
+  </header>
+
+  <main id="top">
+
+    <!-- 2. ГЛАВНЫЙ ЭКРАН -->
+    <section class="hero">
+      <img class="hero__img" src="assets/images/hero.jpg" alt="Автомобиль на подъёмнике в сервисе AUTOFiX" fetchpriority="high">
+      <div class="container hero__content">
+        <h1>Ваш автомобиль<br>в надёжных руках</h1>
+        <p class="hero__lead">Ремонт, диагностика и обслуживание с понятными ценами и гарантией на работы.</p>
+        <div class="hero__actions">
+          <a href="#contacts" class="btn">Записаться на сервис</a>
+          <a href="#services" class="btn btn--ghost">Наши услуги</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. УСЛУГИ -->
+    <section class="section" id="services">
+      <div class="container">
+        <h2 class="section__title">Услуги</h2>
+        <p class="section__lead">Основные работы, с которыми к нам приезжают чаще всего.</p>
+
+        <div class="grid grid--3">
+          <article class="card">
+            <div class="card__media"><img src="assets/images/service-repair.jpg" alt="Ремонт автомобиля" loading="lazy"></div>
+            <div class="card__body">
+              <h3>Ремонт</h3>
+              <p>Двигатель, ходовая, тормозная система и кузовные работы.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card__media"><img src="assets/images/service-diagnostics.jpg" alt="Компьютерная диагностика" loading="lazy"></div>
+            <div class="card__body">
+              <h3>Диагностика</h3>
+              <p>Компьютерная проверка электроники и точное определение причины неисправности.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card__media"><img src="assets/images/service-maintenance.jpg" alt="Техническое обслуживание" loading="lazy"></div>
+            <div class="card__body">
+              <h3>Обслуживание</h3>
+              <p>Замена масла и фильтров, плановое ТО по регламенту производителя.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ПРЕИМУЩЕСТВА -->
+    <section class="section section--dark" id="advantages">
+      <div class="container">
+        <h2 class="section__title">Почему AUTOFiX</h2>
+
+        <ul class="grid grid--4 advantages">
+          <li>
+            <h3>Опытные мастера</h3>
+            <p>Работаем с разными марками и знаем типичные поломки.</p>
+          </li>
+          <li>
+            <h3>Честные цены</h3>
+            <p>Согласуем стоимость до начала работ.</p>
+          </li>
+          <li>
+            <h3>Гарантия</h3>
+            <p>Даём гарантию на выполненные работы и запчасти.</p>
+          </li>
+          <li>
+            <h3>Современное оборудование</h3>
+            <p>Диагностика и ремонт на профессиональном оборудовании.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. ГАЛЕРЕЯ -->
+    <section class="section" id="gallery">
+      <div class="container">
+        <h2 class="section__title">Наш сервис</h2>
+        <p class="section__lead">Мастерская, оборудование и выполненные работы.</p>
+
+        <div class="gallery">
+          <figure><img src="assets/images/gallery-1.jpg" alt="Рабочая зона автосервиса" loading="lazy"></figure>
+          <figure><img src="assets/images/gallery-2.jpg" alt="Инструменты механика" loading="lazy"></figure>
+          <figure><img src="assets/images/gallery-3.jpg" alt="Диагностика автомобиля" loading="lazy"></figure>
+          <figure><img src="assets/images/gallery-4.jpg" alt="Мастер за работой" loading="lazy"></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. КОНТАКТЫ -->
+    <section class="section section--light" id="contacts">
+      <div class="container contacts">
+        <div>
+          <h2 class="section__title">Контакты</h2>
+          <p class="section__lead">Позвоните или приезжайте — подскажем и запишем на удобное время.</p>
+          <a href="tel:+70000000000" class="btn">Позвонить</a>
+        </div>
+        <dl class="contacts__list">
+          <div><dt>Телефон</dt><dd><a href="tel:+70000000000">+7 (000) 000-00-00</a></dd></div>
+          <div><dt>Адрес</dt><dd>Город, улица, дом (заменить на реальный)</dd></div>
+          <div><dt>Часы работы</dt><dd>Пн–Сб, 9:00–20:00</dd></div>
+          <div><dt>Почта</dt><dd><a href="mailto:info@autofix.example">info@autofix.example</a></dd></div>
+        </dl>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 7. ПОДВАЛ -->
+  <footer class="footer">
+    <div class="ornament" aria-hidden="true"></div>
+    <div class="container footer__inner">
+      <a href="#top" class="logo">AUTO<span>FiX</span></a>
+      <p>© <span id="year">2026</span> AUTOFiX. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

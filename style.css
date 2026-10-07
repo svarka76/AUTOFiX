@@ -1,0 +1,191 @@
+/* ===== AUTOFiX — стили ===== */
+
+/* 1. Переменные: меняйте цвета и размеры здесь */
+:root {
+  --ink: #15191b;          /* тёмный фон */
+  --ink-soft: #1f2528;
+  --paper: #fbf8f2;        /* светлый фон */
+  --red: #b3202a;          /* ярославский красный */
+  --green: #1d6b4e;        /* татарский зелёный */
+  --gold: #c9a24a;         /* золото */
+  --text: #23282b;
+  --muted: #6b7277;
+
+  --font-body: 'Onest', system-ui, sans-serif;
+  --font-head: 'Unbounded', 'Onest', sans-serif;
+
+  --radius: 6px;
+  --header-h: 72px;
+  --ease: 0.25s ease;
+}
+
+/* 2. Базовые настройки */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--paper);
+  line-height: 1.6;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.15; margin: 0; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.container { width: min(1160px, 100% - 40px); margin-inline: auto; }
+
+/* 3. Орнамент: тонкая полоса «красный — золото — зелёный» с ромбовидным узором */
+.ornament {
+  height: 6px;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 6px, rgba(0,0,0,.18) 6px 7px),
+    linear-gradient(90deg, var(--red) 0 33%, var(--gold) 33% 66%, var(--green) 66% 100%);
+}
+
+/* 4. Кнопки */
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  background: var(--red);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius);
+  border: 1px solid var(--red);
+  transition: background var(--ease), transform var(--ease), border-color var(--ease);
+}
+.btn:hover { background: #8f1922; border-color: #8f1922; transform: translateY(-2px); }
+.btn--small { padding: 9px 18px; }
+.btn--ghost { background: transparent; border-color: rgba(255,255,255,.6); }
+.btn--ghost:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+
+/* 5. Шапка */
+.header {
+  position: fixed; inset: 0 0 auto 0; z-index: 10;
+  background: rgba(21,25,27,.92);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  transition: box-shadow var(--ease);
+}
+.header.is-scrolled { box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.header__inner { display: flex; align-items: center; justify-content: space-between; height: calc(var(--header-h) - 6px); }
+.logo { font-family: var(--font-head); font-weight: 600; font-size: 1.4rem; text-decoration: none; letter-spacing: .02em; }
+.logo span { color: var(--gold); }
+
+.nav { display: flex; align-items: center; gap: 28px; }
+.nav a:not(.btn) { text-decoration: none; position: relative; padding: 4px 0; }
+.nav a:not(.btn)::after {
+  content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px;
+  background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform var(--ease);
+}
+.nav a:not(.btn):hover::after { transform: scaleX(1); }
+
+.burger { display: none; background: none; border: 0; padding: 8px; cursor: pointer; }
+.burger span { display: block; width: 24px; height: 2px; background: #fff; margin: 5px 0; transition: transform var(--ease), opacity var(--ease); }
+.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* 6. Главный экран */
+.hero {
+  position: relative;
+  min-height: 100vh; min-height: 100svh;
+  display: flex; align-items: center;
+  padding-top: var(--header-h);
+  color: #fff;
+  background: linear-gradient(135deg, var(--ink) 40%, #24382f 100%); /* виден, пока нет hero.jpg */
+  overflow: hidden;
+}
+.hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero::after { /* затемнение для читаемости текста */
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(21,25,27,.88) 0%, rgba(21,25,27,.4) 70%, rgba(21,25,27,.2) 100%);
+}
+.hero__content { position: relative; z-index: 1; animation: rise .9s ease both; }
+.hero h1 { font-size: clamp(2rem, 5.5vw, 4rem); max-width: 14ch; }
+.hero__lead { margin-top: 20px; max-width: 46ch; font-size: 1.15rem; color: rgba(255,255,255,.85); }
+.hero__actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+/* 7. Секции */
+.section { padding: clamp(56px, 9vw, 104px) 0; }
+.section--dark { background: var(--ink); color: #fff; }
+.section--light { background: #f1ece1; }
+.section__title { font-size: clamp(1.6rem, 3.4vw, 2.3rem); }
+.section__lead { margin-top: 12px; color: var(--muted); max-width: 52ch; }
+.section--dark .section__lead { color: rgba(255,255,255,.7); }
+.section__title + .grid, .section__lead + .grid, .section__lead + .gallery { margin-top: 40px; }
+.section__title + .advantages { margin-top: 40px; }
+
+.grid { display: grid; gap: 24px; }
+.grid--3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.grid--4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+/* Заглушка для изображений, пока нет файлов */
+.card__media, .gallery figure {
+  background: linear-gradient(135deg, #2a3a33, #3b2a2a);
+  overflow: hidden; margin: 0;
+}
+img.is-missing { visibility: hidden; }
+
+/* 8. Карточки услуг */
+.card { background: #fff; border-radius: var(--radius); overflow: hidden; border-bottom: 3px solid var(--gold);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06); transition: transform var(--ease), box-shadow var(--ease); }
+.card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+.card__media { aspect-ratio: 4 / 3; }
+.card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.card:hover .card__media img { transform: scale(1.05); }
+.card__body { padding: 22px; }
+.card__body h3 { font-size: 1.15rem; margin-bottom: 8px; }
+.card__body p { color: var(--muted); }
+
+/* 9. Преимущества */
+.advantages { list-style: none; padding: 0; margin: 0; }
+.advantages li { padding: 24px; border-top: 3px solid var(--green); background: var(--ink-soft); border-radius: var(--radius); }
+.advantages li:nth-child(odd) { border-top-color: var(--red); }
+.advantages h3 { font-size: 1.05rem; margin-bottom: 10px; color: var(--gold); }
+.advantages p { color: rgba(255,255,255,.75); }
+
+/* 10. Галерея */
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.gallery figure { aspect-ratio: 1; border-radius: var(--radius); }
+.gallery figure:first-child { grid-column: span 2; aspect-ratio: auto; min-height: 240px; }
+.gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.gallery figure:hover img { transform: scale(1.06); }
+
+/* 11. Контакты */
+.contacts { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.contacts .btn { margin-top: 24px; }
+.contacts__list { margin: 0; display: grid; gap: 18px; }
+.contacts__list dt { font-size: .85rem; color: var(--muted); }
+.contacts__list dd { margin: 2px 0 0; font-weight: 500; font-size: 1.1rem; }
+.contacts__list a { text-decoration: none; }
+.contacts__list a:hover { color: var(--red); }
+
+/* 12. Подвал */
+.footer { background: var(--ink); color: rgba(255,255,255,.75); }
+.footer__inner { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; padding: 28px 0; }
+.footer .logo { color: #fff; }
+
+/* 13. Адаптив */
+@media (max-width: 820px) {
+  .burger { display: block; }
+  .nav {
+    position: absolute; top: var(--header-h); left: 0; right: 0;
+    flex-direction: column; align-items: flex-start; gap: 16px;
+    padding: 24px 20px; background: var(--ink);
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+  .contacts { grid-template-columns: 1fr; gap: 32px; }
+  .gallery figure:first-child { grid-column: auto; }
+}
+
+/* Уважаем настройку «уменьшить анимацию» */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
