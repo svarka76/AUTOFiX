@@ -36,6 +36,28 @@
 
     <!-- 2. ГЛАВНЫЙ ЭКРАН -->
     <section class="hero">
+      <div class="hero__ph" aria-hidden="true">
+        <span class="hero__ph-ring hero__ph-ring--1"></span>
+        <span class="hero__ph-ring hero__ph-ring--2"></span>
+        <div class="hero__ph-stage">
+          <div class="car">
+            <span class="car__body"></span>
+            <span class="car__glass"></span>
+            <span class="car__line"></span>
+            <span class="car__light"></span>
+            <span class="car__tail"></span>
+            <span class="car__wheel car__wheel--rear"></span>
+            <span class="car__wheel car__wheel--front"></span>
+          </div>
+          <span class="hero__ph-ground"></span>
+          <div class="hero__ph-tag">
+            <span class="hero__ph-eyebrow">Современный сервис AUTOFiX</span>
+            <span class="hero__ph-word">AUTO<span>FiX</span></span>
+            <strong>Здесь будет фотография современного автосервиса</strong>
+            <small>Изображение будет добавлено позже</small>
+          </div>
+        </div>
+      </div>
       <img class="hero__img" src="assets/images/hero.jpg" alt="Автомобиль на подъёмнике в сервисе AUTOFiX" fetchpriority="high">
       <div class="container hero__content">
         <h1>Ваш автомобиль<br>в надёжных руках</h1>
@@ -55,21 +77,21 @@
 
         <div class="grid grid--3">
           <article class="card">
-            <div class="card__media"><img src="assets/images/service-repair.jpg" alt="Ремонт автомобиля" loading="lazy"></div>
+            <div class="card__media"><div class="ph ph--repair" aria-hidden="true"><div class="ph__art"><i class="ph__line"></i><i class="ph__gear"></i></div><div class="ph__label"><strong>Здесь будет фотография ремонта</strong><span>Ремонт и восстановление автомобиля</span></div></div><img src="assets/images/service-repair.jpg" alt="Ремонт автомобиля" loading="lazy"></div>
             <div class="card__body">
               <h3>Ремонт</h3>
               <p>Двигатель, ходовая, тормозная система и кузовные работы.</p>
             </div>
           </article>
           <article class="card">
-            <div class="card__media"><img src="assets/images/service-diagnostics.jpg" alt="Компьютерная диагностика" loading="lazy"></div>
+            <div class="card__media"><div class="ph ph--diagnostics" aria-hidden="true"><div class="ph__art"><i class="ph__gauge"></i><i class="ph__needle"></i><i class="ph__ruler"></i></div><div class="ph__label"><strong>Здесь будет фотография диагностики</strong><span>Компьютерная диагностика</span></div></div><img src="assets/images/service-diagnostics.jpg" alt="Компьютерная диагностика" loading="lazy"></div>
             <div class="card__body">
               <h3>Диагностика</h3>
               <p>Компьютерная проверка электроники и точное определение причины неисправности.</p>
             </div>
           </article>
           <article class="card">
-            <div class="card__media"><img src="assets/images/service-maintenance.jpg" alt="Техническое обслуживание" loading="lazy"></div>
+            <div class="card__media"><div class="ph ph--maintenance" aria-hidden="true"><div class="ph__art"><i class="ph__drop"></i><i class="ph__bars"></i></div><div class="ph__label"><strong>Здесь будет фотография технического обслуживания</strong><span>ТО и обслуживание</span></div></div><img src="assets/images/service-maintenance.jpg" alt="Техническое обслуживание" loading="lazy"></div>
             <div class="card__body">
               <h3>Обслуживание</h3>
               <p>Замена масла и фильтров, плановое ТО по регламенту производителя.</p>
@@ -112,10 +134,10 @@
         <p class="section__lead">Мастерская, оборудование и выполненные работы.</p>
 
         <div class="gallery">
-          <figure><img src="assets/images/gallery-1.jpg" alt="Рабочая зона автосервиса" loading="lazy"></figure>
-          <figure><img src="assets/images/gallery-2.jpg" alt="Инструменты механика" loading="lazy"></figure>
-          <figure><img src="assets/images/gallery-3.jpg" alt="Диагностика автомобиля" loading="lazy"></figure>
-          <figure><img src="assets/images/gallery-4.jpg" alt="Мастер за работой" loading="lazy"></figure>
+          <figure><div class="ph ph--shop" aria-hidden="true"><div class="ph__art"><i class="ph__beam"></i><i class="ph__post ph__post--l"></i><i class="ph__post ph__post--r"></i><i class="ph__arm"></i><i class="ph__floor"></i></div><div class="ph__label"><strong>Здесь будет фотография сервиса</strong><span>Рабочая зона AUTOFiX</span></div></div><img src="assets/images/gallery-1.jpg" alt="Рабочая зона автосервиса" loading="lazy"></figure>
+          <figure><div class="ph ph--tools" aria-hidden="true"><div class="ph__art"><i class="ph__wr ph__wr--1"></i><i class="ph__wr ph__wr--2"></i><i class="ph__nut"></i></div><div class="ph__label"><strong>Здесь будет фотография процесса ремонта</strong><span>Работа мастера</span></div></div><img src="assets/images/gallery-2.jpg" alt="Инструменты механика" loading="lazy"></figure>
+          <figure><div class="ph ph--done" aria-hidden="true"><div class="ph__art"><i class="ph__beam ph__beam--car"></i><div class="car car--mini"><span class="car__body"></span><span class="car__glass"></span><span class="car__line"></span><span class="car__light"></span><span class="car__tail"></span><span class="car__wheel car__wheel--rear"></span><span class="car__wheel car__wheel--front"></span></div><i class="ph__check"></i></div><div class="ph__label"><strong>Здесь будет фотография автомобиля</strong><span>Автомобиль после обслуживания</span></div></div><img src="assets/images/gallery-3.jpg" alt="Диагностика автомобиля" loading="lazy"></figure>
+          <figure><div class="ph ph--lounge" aria-hidden="true"><div class="ph__art"><i class="ph__win"></i><i class="ph__sofa"></i><i class="ph__cup"></i></div><div class="ph__label"><strong>Здесь будет фотография клиентской зоны</strong><span>Комфортная зона ожидания</span></div></div><img src="assets/images/gallery-4.jpg" alt="Мастер за работой" loading="lazy"></figure>
         </div>
       </div>
     </section>

@@ -27,9 +27,14 @@ function onScroll() {
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-// 3. Если файла изображения ещё нет — прячем его, остаётся красивая заглушка
+// 3. Если файла изображения ещё нет — прячем его, остаётся красивая заглушка.
+//    Когда JPG появляется по нужному пути, фото автоматически закрывает заглушку.
 document.querySelectorAll('img').forEach((img) => {
-  img.addEventListener('error', () => img.classList.add('is-missing'));
+  const markMissing = () => img.classList.add('is-missing');
+  img.addEventListener('error', markMissing);
+  img.addEventListener('load', () => img.classList.remove('is-missing'));
+  // Ошибка могла случиться до того, как скрипт успел подписаться на событие
+  if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) markMissing();
 });
 
 // 4. Год в подвале
