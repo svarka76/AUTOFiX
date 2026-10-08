@@ -1,301 +1,1115 @@
-// AUTOFiX — базовый JavaScript
-
-// 1. Мобильное меню
-const burger = document.getElementById('burger');
-const nav = document.getElementById('nav');
-
-function setMenu(open) {
-  nav.classList.toggle('is-open', open);
-  burger.setAttribute('aria-expanded', String(open));
-  burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+:root {
+  --green: #176b3a;
+  --green-dark: #0d4225;
+  --green-light: #eaf5ee;
+  --red: #c62828;
+  --red-dark: #9f1f1f;
+  --white: #ffffff;
+  --black: #111111;
+  --gray: #6b7280;
+  --gray-light: #f4f6f5;
+  --border: #dce3df;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --radius: 18px;
+  --container: 1180px;
 }
 
-burger.addEventListener('click', () => {
-  setMenu(!nav.classList.contains('is-open'));
-});
-
-// Закрываем меню после клика по ссылке
-nav.querySelectorAll('a').forEach((link) => {
-  link.addEventListener('click', () => setMenu(false));
-});
-
-// 2. Шапка получает тень при прокрутке
-const header = document.getElementById('header');
-function onScroll() {
-  header.classList.toggle('is-scrolled', window.scrollY > 10);
-}
-window.addEventListener('scroll', onScroll, { passive: true });
-onScroll();
-
-// 3. Если файла изображения ещё нет — прячем его, остаётся красивая заглушка.
-//    Когда JPG появляется по нужному пути, фото автоматически закрывает заглушку.
-document.querySelectorAll('img').forEach((img) => {
-  const markMissing = () => img.classList.add('is-missing');
-  img.addEventListener('error', markMissing);
-  img.addEventListener('load', () => img.classList.remove('is-missing'));
-  // Ошибка могла случиться до того, как скрипт успел подписаться на событие
-  if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) markMissing();
-});
-
-// 4. Год в подвале
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// 5. Заявка на сервис → Supabase
-//    Вставьте адрес проекта и публичный (anon) ключ: Supabase → Project Settings → API.
-//    anon-ключ публичный по замыслу, доступ к данным ограничивает RLS.
-const SUPABASE_URL = 'https://hzzglbgrgcxwhvtumoax.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_g0lr_8L1JciriuketB_GEA_-QpQSsjT';
-const ORDERS_TABLE = 'AUTOFiX';
-
-const sb = (window.supabase && !SUPABASE_URL.includes('YOUR-') && !SUPABASE_ANON_KEY.includes('YOUR-'))
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
-
-function showFormMessage(el, text, type) {
-  if (!el) return;
-  el.textContent = text;
-  el.className = 'form__msg' + (type ? ' form__msg--' + type : '');
+* {
+  box-sizing: border-box;
 }
 
-function authErrorMessage(error, context) {
-  const msg = (error && error.message) || '';
-  const status = error && error.status;
-  if (/invalid login credentials/i.test(msg)) return 'Неверный email или пароль.';
-  if (/email not confirmed/i.test(msg)) return 'Подтвердите email по ссылке из письма, затем войдите снова.';
-  if (/already registered|user already/i.test(msg)) return 'Этот email уже зарегистрирован. Войдите или укажите другой адрес.';
-  if (/password/i.test(msg) && /at least|characters/i.test(msg)) return 'Пароль слишком короткий. Укажите не менее 6 символов.';
-  if (/invalid email/i.test(msg)) return 'Проверьте адрес электронной почты.';
-  if (/signup is disabled/i.test(msg)) return 'Регистрация временно недоступна.';
-  if (/rate limit|too many/i.test(msg) || status === 429) return 'Слишком много попыток. Подождите немного и попробуйте снова.';
-  if (context === 'signup') return 'Не удалось зарегистрироваться. Проверьте данные и попробуйте ещё раз.';
-  if (context === 'signin') return 'Не удалось войти. Проверьте данные и попробуйте ещё раз.';
-  return 'Не удалось выполнить действие. Попробуйте ещё раз.';
+html {
+  scroll-behavior: smooth;
 }
 
-// 5a. Вход, регистрация, выход — тот же клиент sb
-const authGuest = document.getElementById('auth-guest');
-const authUser = document.getElementById('auth-user');
-const authEmail = document.getElementById('auth-email');
-const authHint = document.getElementById('order-auth-hint');
-const authDialog = document.getElementById('auth-dialog');
-const authDialogTitle = document.getElementById('auth-dialog-title');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const loginTab = document.getElementById('auth-tab-login');
-const registerTab = document.getElementById('auth-tab-register');
-const loginMsg = document.getElementById('login-msg');
-const registerMsg = document.getElementById('register-msg');
-const loginBtn = document.getElementById('login-submit');
-const registerBtn = document.getElementById('register-submit');
+body {
+  margin: 0;
+  font-family: "Onest", Arial, sans-serif;
+  color: var(--black);
+  background: var(--white);
+  line-height: 1.6;
+}
 
-function setAuthView(user) {
-  const signedIn = !!(user && user.email);
-  authGuest.classList.toggle('is-hidden', signedIn);
-  authUser.classList.toggle('is-hidden', !signedIn);
-  authEmail.textContent = signedIn ? user.email : '';
-  if (authHint) {
-    authHint.hidden = signedIn;
-    if (!signedIn) {
-      authHint.textContent = 'Чтобы отправить заявку, войдите в аккаунт или зарегистрируйтесь — кнопки вверху справа.';
-    }
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(calc(100% - 40px), var(--container));
+  margin: 0 auto;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow 0.25s ease;
+}
+
+.header.is-scrolled {
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.header__inner {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.logo {
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--green-dark);
+  white-space: nowrap;
+}
+
+.logo span {
+  color: var(--red);
+}
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav > a:not(.btn) {
+  font-size: 14px;
+  font-weight: 500;
+  color: #26332b;
+  transition: color 0.2s ease;
+}
+
+.nav > a:not(.btn):hover {
+  color: var(--red);
+}
+
+.ornament {
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--green) 0 50%,
+    var(--red) 50% 100%
+  );
+}
+
+.burger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 9px;
+  border: 0;
+  background: transparent;
+}
+
+.burger span {
+  display: block;
+  height: 2px;
+  margin: 6px 0;
+  background: var(--green-dark);
+  border-radius: 10px;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--white);
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  transform: translateY(-1px);
+}
+
+.btn--small {
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--green);
+}
+
+.btn--ghost:hover {
+  background: var(--green-light);
+  color: var(--green-dark);
+  border-color: var(--green);
+}
+
+/* =========================
+   AUTH
+   ========================= */
+
+.auth {
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.auth__guest,
+.auth__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth__email {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* =========================
+   AUTH DIALOG
+   ========================= */
+
+.auth-dialog {
+  width: min(460px, calc(100% - 30px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.auth-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.auth-dialog__inner {
+  position: relative;
+  padding: 30px;
+  background: var(--white);
+}
+
+.auth-dialog__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--gray-light);
+  color: var(--black);
+  font-size: 22px;
+}
+
+.auth-dialog__close:hover {
+  background: #e7ece9;
+}
+
+.auth-dialog h2 {
+  margin: 0 45px 22px 0;
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.auth-dialog__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: var(--gray-light);
+}
+
+.auth-dialog__tabs button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--gray);
+  font-weight: 600;
+}
+
+.auth-dialog__tabs button.is-active {
+  background: var(--white);
+  color: var(--green-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auth-dialog__form {
+  display: grid;
+  gap: 15px;
+}
+
+/* =========================
+   HERO
+   ========================= */
+
+.hero {
+  position: relative;
+  min-height: 650px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 75% 35%, rgba(23, 107, 58, 0.18), transparent 35%),
+    linear-gradient(135deg, #f7faf8, #e9f1ec);
+}
+
+.hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+}
+
+.hero__img.is-missing {
+  display: none;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  max-width: 760px;
+  margin: 0 0 24px;
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: clamp(38px, 6vw, 72px);
+  line-height: 1.12;
+  color: var(--green-dark);
+}
+
+.hero__lead {
+  max-width: 620px;
+  margin: 0 0 30px;
+  font-size: 20px;
+  color: #34443a;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Placeholder hero */
+
+.hero__ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 7%;
+  overflow: hidden;
+}
+
+.hero__ph-stage {
+  position: relative;
+  width: min(550px, 45vw);
+  height: 400px;
+}
+
+.hero__ph-ring {
+  position: absolute;
+  border: 1px solid rgba(23, 107, 58, 0.16);
+  border-radius: 50%;
+}
+
+.hero__ph-ring--1 {
+  width: 420px;
+  height: 420px;
+  right: 30px;
+  top: 0;
+}
+
+.hero__ph-ring--2 {
+  width: 300px;
+  height: 300px;
+  right: 90px;
+  top: 60px;
+}
+
+.hero__ph-ground {
+  position: absolute;
+  left: 20px;
+  right: 0;
+  bottom: 65px;
+  height: 3px;
+  background: rgba(23, 107, 58, 0.2);
+}
+
+.car {
+  position: absolute;
+  left: 45px;
+  right: 35px;
+  bottom: 80px;
+  height: 140px;
+}
+
+.car__body {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 25px;
+  height: 75px;
+  border-radius: 35px 50px 18px 18px;
+  background: var(--red);
+  transform: skewX(-5deg);
+}
+
+.car__glass {
+  position: absolute;
+  left: 30%;
+  top: 15px;
+  width: 42%;
+  height: 48px;
+  border-radius: 22px 28px 5px 5px;
+  background: #dce8e2;
+  border: 4px solid var(--red);
+}
+
+.car__line {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 55px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.car__light {
+  position: absolute;
+  right: 7%;
+  bottom: 62px;
+  width: 26px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.car__tail {
+  position: absolute;
+  left: 7%;
+  bottom: 58px;
+  width: 22px;
+  height: 14px;
+  border-radius: 5px;
+  background: #500;
+}
+
+.car__wheel {
+  position: absolute;
+  bottom: 0;
+  width: 58px;
+  height: 58px;
+  border: 8px solid #222;
+  border-radius: 50%;
+  background: #777;
+}
+
+.car__wheel--rear {
+  left: 18%;
+}
+
+.car__wheel--front {
+  right: 18%;
+}
+
+.hero__ph-tag {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  display: grid;
+  gap: 5px;
+  max-width: 280px;
+  padding: 16px;
+  border: 1px solid rgba(23, 107, 58, 0.15);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.hero__ph-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.hero__ph-word {
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+.hero__ph-word span {
+  color: var(--red);
+}
+
+.hero__ph-tag strong {
+  font-size: 13px;
+}
+
+.hero__ph-tag small {
+  color: var(--gray);
+  font-size: 11px;
+}
+
+/* =========================
+   SECTIONS
+   ========================= */
+
+.section {
+  padding: 90px 0;
+}
+
+.section--dark {
+  background: var(--green-dark);
+  color: var(--white);
+}
+
+.section--light {
+  background: var(--gray-light);
+}
+
+.section__title {
+  margin: 0 0 12px;
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.2;
+}
+
+.section__lead {
+  max-width: 720px;
+  margin: 0 0 40px;
+  color: var(--gray);
+}
+
+.section--dark .section__lead {
+  color: #c8d9cf;
+}
+
+/* =========================
+   GRID / CARDS
+   ========================= */
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.card__media {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  background: var(--green-light);
+}
+
+.card__media img {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__media img.is-missing {
+  display: none;
+}
+
+.card__body {
+  padding: 24px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: 20px;
+}
+
+.card p {
+  margin: 0;
+  color: var(--gray);
+}
+
+/* =========================
+   PLACEHOLDERS
+   ========================= */
+
+.ph {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(23, 107, 58, 0.95), rgba(13, 66, 37, 0.92));
+}
+
+.ph__label {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 5;
+  display: grid;
+  gap: 4px;
+  color: var(--white);
+}
+
+.ph__label strong {
+  font-size: 14px;
+}
+
+.ph__label span {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.ph__art {
+  position: absolute;
+  inset: 0;
+  opacity: 0.8;
+}
+
+.ph__gear {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 18px dotted #fff;
+  border-radius: 50%;
+  top: 45px;
+  right: 55px;
+}
+
+.ph__gauge {
+  position: absolute;
+  width: 150px;
+  height: 75px;
+  border: 12px solid #fff;
+  border-bottom: 0;
+  border-radius: 150px 150px 0 0;
+  left: 50px;
+  top: 50px;
+}
+
+.ph__drop {
+  position: absolute;
+  width: 50px;
+  height: 70px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--red);
+  transform: rotate(-45deg);
+  top: 50px;
+  left: 70px;
+}
+
+.ph__beam {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 45px;
+  height: 10px;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.ph__post {
+  position: absolute;
+  width: 12px;
+  height: 150px;
+  top: 50px;
+  background: #fff;
+}
+
+.ph__post--l {
+  left: 20%;
+}
+
+.ph__post--r {
+  right: 20%;
+}
+
+.ph__wr {
+  position: absolute;
+  width: 80px;
+  height: 20px;
+  border-radius: 20px;
+  background: #fff;
+  transform: rotate(-25deg);
+}
+
+.ph__wr--1 {
+  top: 70px;
+  left: 70px;
+}
+
+.ph__wr--2 {
+  top: 120px;
+  left: 110px;
+}
+
+.ph__win {
+  position: absolute;
+  left: 50px;
+  right: 50px;
+  top: 35px;
+  height: 100px;
+  border: 7px solid #fff;
+}
+
+.ph__sofa {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  bottom: 60px;
+  height: 55px;
+  border-radius: 15px;
+  background: var(--red);
+}
+
+/* =========================
+   ADVANTAGES
+   ========================= */
+
+.advantages {
+  list-style: none;
+  padding: 0;
+  margin: 45px 0 0;
+}
+
+.advantages li {
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.advantages h3 {
+  margin: 0 0 10px;
+  font-family: "Unbounded", Arial, sans-serif;
+  font-size: 17px;
+}
+
+.advantages p {
+  margin: 0;
+  color: #c8d9cf;
+  font-size: 14px;
+}
+
+/* =========================
+   GALLERY
+   ========================= */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.gallery figure {
+  position: relative;
+  min-height: 300px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--green-light);
+}
+
+.gallery figure > img {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery figure > img.is-missing {
+  display: none;
+}
+
+/* =========================
+   ORDER FORM
+   ========================= */
+
+.order__form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  padding: 32px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #dbe9e1;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid #b8c9bf;
+  border-radius: 10px;
+  padding: 13px 14px;
+  outline: none;
+  background: var(--white);
+  color: var(--black);
+}
+
+.field textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(23, 107, 58, 0.15);
+}
+
+.order__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+}
+
+.form__msg {
+  margin: 0;
+  font-size: 14px;
+}
+
+.form__msg--error {
+  color: #ffb4b4;
+}
+
+.form__msg--ok {
+  color: #a8e6bf;
+}
+
+.order__form + .form__msg {
+  margin-top: 15px;
+}
+
+#order-auth-hint {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(198, 40, 40, 0.15);
+}
+
+/* =========================
+   CONTACTS
+   ========================= */
+
+.contacts {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 50px;
+}
+
+.contacts__list {
+  display: grid;
+  gap: 16px;
+}
+
+.contacts__item {
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+
+.contacts__item h3 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.contacts__item p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.footer {
+  padding: 35px 0;
+  background: #092d1a;
+  color: #c8d9cf;
+}
+
+.footer__inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.footer .logo {
+  color: var(--white);
+}
+
+.footer p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 1000px) {
+  .nav {
+    gap: 10px;
+  }
+
+  .nav > a:not(.btn) {
+    display: none;
+  }
+
+  .burger {
+    display: block;
+    margin-left: auto;
+  }
+
+  .nav {
+    position: absolute;
+    top: 76px;
+    left: 20px;
+    right: 20px;
+    display: none;
+    padding: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  .nav.is-open {
+    display: flex;
+  }
+
+  .nav.is-open > a:not(.btn) {
+    display: block;
+    padding: 10px;
+  }
+
+  .auth {
+    margin: 5px 0 0;
+  }
+
+  .auth__guest,
+  .auth__user {
+    width: 100%;
+  }
+
+  .auth__guest .btn,
+  .auth__user .btn {
+    flex: 1;
+  }
+
+  .grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero__ph {
+    opacity: 0.35;
+    padding-right: 0;
   }
 }
 
-function showAuthPanel(mode) {
-  const isLogin = mode === 'login';
-  loginForm.classList.toggle('is-hidden', !isLogin);
-  registerForm.classList.toggle('is-hidden', isLogin);
-  loginTab.classList.toggle('is-active', isLogin);
-  registerTab.classList.toggle('is-active', !isLogin);
-  authDialogTitle.textContent = isLogin ? 'Вход' : 'Регистрация';
-  showFormMessage(loginMsg, '', '');
-  showFormMessage(registerMsg, '', '');
-}
-
-function openAuthDialog(mode) {
-  setMenu(false);
-  showAuthPanel(mode);
-  if (typeof authDialog.showModal === 'function') authDialog.showModal();
-  else authDialog.setAttribute('open', '');
-}
-
-function closeAuthDialog() {
-  if (typeof authDialog.close === 'function' && authDialog.open) authDialog.close();
-  else authDialog.removeAttribute('open');
-}
-
-if (sb && authDialog) {
-  document.getElementById('auth-open-login').addEventListener('click', () => openAuthDialog('login'));
-  document.getElementById('auth-open-register').addEventListener('click', () => openAuthDialog('register'));
-  document.getElementById('auth-dialog-close').addEventListener('click', closeAuthDialog);
-  loginTab.addEventListener('click', () => showAuthPanel('login'));
-  registerTab.addEventListener('click', () => showAuthPanel('register'));
-
-  authDialog.addEventListener('click', (event) => {
-    if (event.target === authDialog) closeAuthDialog();
-  });
-
-  document.getElementById('auth-logout').addEventListener('click', async () => {
-    setMenu(false);
-    const { error } = await sb.auth.signOut();
-    if (error) {
-      if (authHint) {
-        authHint.hidden = false;
-        authHint.textContent = 'Не удалось выйти. Попробуйте обновить страницу.';
-      }
-    }
-  });
-
-  loginForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!loginForm.reportValidity()) return;
-    loginBtn.disabled = true;
-    showFormMessage(loginMsg, 'Входим…', '');
-    try {
-      const data = new FormData(loginForm);
-      const { error } = await sb.auth.signInWithPassword({
-        email: String(data.get('email') || '').trim(),
-        password: String(data.get('password') || '')
-      });
-      if (error) {
-        showFormMessage(loginMsg, authErrorMessage(error, 'signin'), 'error');
-        return;
-      }
-      loginForm.reset();
-      closeAuthDialog();
-    } catch (err) {
-      showFormMessage(loginMsg, 'Нет соединения. Проверьте интернет и попробуйте ещё раз.', 'error');
-    } finally {
-      loginBtn.disabled = false;
-    }
-  });
-
-  registerForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!registerForm.reportValidity()) return;
-    const data = new FormData(registerForm);
-    const email = String(data.get('email') || '').trim();
-    const password = String(data.get('password') || '');
-    const password2 = String(data.get('password2') || '');
-    if (password !== password2) {
-      showFormMessage(registerMsg, 'Пароли не совпадают. Проверьте оба поля.', 'error');
-      return;
-    }
-    registerBtn.disabled = true;
-    showFormMessage(registerMsg, 'Создаём аккаунт…', '');
-    try {
-      const { data: signUpData, error } = await sb.auth.signUp({ email, password });
-      if (error) {
-        showFormMessage(registerMsg, authErrorMessage(error, 'signup'), 'error');
-        return;
-      }
-      if (signUpData.user && Array.isArray(signUpData.user.identities) && signUpData.user.identities.length === 0) {
-        showFormMessage(registerMsg, 'Этот email уже зарегистрирован. Войдите или укажите другой адрес.', 'error');
-        return;
-      }
-      registerForm.reset();
-      if (!signUpData.session) {
-        showFormMessage(registerMsg, 'Проверьте почту и подтвердите email.', 'ok');
-        return;
-      }
-      closeAuthDialog();
-    } catch (err) {
-      showFormMessage(registerMsg, 'Нет соединения. Проверьте интернет и попробуйте ещё раз.', 'error');
-    } finally {
-      registerBtn.disabled = false;
-    }
-  });
-
-  sb.auth.onAuthStateChange((_event, session) => {
-    setAuthView(session && session.user);
-  });
-
-  sb.auth.getUser().then(({ data: { user } }) => setAuthView(user)).catch(() => setAuthView(null));
-} else {
-  setAuthView(null);
-}
-
-const orderForm = document.getElementById('order-form');
-
-if (orderForm) {
-  const orderMsg = document.getElementById('order-msg');
-  const orderBtn = document.getElementById('order-submit');
-  const yearInput = document.getElementById('f-year');
-  const dateInput = document.getElementById('f-date');
-
-  // Ограничения полей: год — не позже следующего, дата — не раньше сегодняшней
-  const now = new Date();
-  yearInput.max = String(now.getFullYear() + 1);
-  dateInput.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-
-  function showOrderMessage(text, type) {
-    orderMsg.textContent = text;
-    orderMsg.className = 'form__msg' + (type ? ' form__msg--' + type : '');
+@media (max-width: 760px) {
+  .container {
+    width: min(calc(100% - 28px), var(--container));
   }
 
-  orderForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!orderForm.reportValidity()) return;
+  .header__inner {
+    min-height: 66px;
+  }
 
-    if (!sb) {
-      showOrderMessage('Приём заявок через сайт пока не настроен. Позвоните нам — запишем по телефону.', 'error');
-      return;
-    }
+  .logo {
+    font-size: 20px;
+  }
 
-    orderBtn.disabled = true;
-    showOrderMessage('Отправляем…', '');
+  .nav {
+    top: 66px;
+    left: 14px;
+    right: 14px;
+  }
 
-    try {
-      // 1. Текущий пользователь из Supabase Auth (проверяется на сервере)
-      const { data: { user }, error: authError } = await sb.auth.getUser();
+  .hero {
+    min-height: 620px;
+  }
 
-      // 2. Не авторизован — заявку не отправляем
-      if (authError || !user) {
-        showOrderMessage('Чтобы отправить заявку, войдите в аккаунт или зарегистрируйтесь.', 'error');
-        return;
-      }
+  .hero h1 {
+    font-size: 38px;
+  }
 
-      // 3. Поля берём по одному и явно: user_id всегда из Auth, значение из формы не принимается.
-      //    status задаётся здесь и не зависит от формы.
-      const data = new FormData(orderForm);
-      const text = (name) => String(data.get(name) || '').trim();
-      const order = {
-        user_id: user.id,
-        name: text('name'),
-        email: text('email'),
-        phone: text('phone'),
-        car_brand: text('car_brand'),
-        car_model: text('car_model'),
-        car_year: parseInt(text('car_year'), 10),
-        service: text('service'),
-        description: text('description'),
-        preferred_date: text('preferred_date'),
-        status: 'new'
-      };
+  .hero__lead {
+    font-size: 17px;
+  }
 
-      if (!Number.isInteger(order.car_year)) {
-        showOrderMessage('Укажите год выпуска числом, например 2018.', 'error');
-        return;
-      }
+  .hero__ph {
+    opacity: 0.2;
+  }
 
-      const { error } = await sb.from(ORDERS_TABLE).insert(order);
+  .hero__ph-stage {
+    width: 500px;
+  }
 
-      if (error) {
-        const denied = error.code === '42501' || /row-level security/i.test(error.message || '');
-        showOrderMessage(
-          denied ? 'Не удалось отправить заявку: нет доступа. Войдите в аккаунт заново.'
-                 : 'Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.',
-          'error'
-        );
-        return;
-      }
+  .section {
+    padding: 65px 0;
+  }
 
-      orderForm.reset();
-      showOrderMessage('Заявка отправлена. Мы свяжемся с вами в ближайшее время.', 'ok');
-    } catch (err) {
-      showOrderMessage('Нет соединения. Проверьте интернет и попробуйте ещё раз.', 'error');
-    } finally {
-      orderBtn.disabled = false;
-    }
-  });
+  .grid--3,
+  .grid--4,
+  .gallery,
+  .contacts {
+    grid-template-columns: 1fr;
+  }
+
+  .order__form {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .field--wide {
+    grid-column: auto;
+  }
+
+  .order__actions {
+    grid-column: auto;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .order__actions .btn {
+    width: 100%;
+  }
+
+  .footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth__email {
+    max-width: 120px;
+  }
+
+  .auth__guest {
+    flex-direction: column;
+  }
+
+  .auth__guest .btn {
+    width: 100%;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+  }
+
+  .auth-dialog__inner {
+    padding: 24px 18px;
+  }
 }
