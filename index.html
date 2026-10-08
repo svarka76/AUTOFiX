@@ -26,7 +26,7 @@
         <a href="#advantages">Преимущества</a>
         <a href="#gallery">Галерея</a>
         <a href="#contacts">Контакты</a>
-        <a href="#contacts" class="btn btn--small">Записаться</a>
+        <a href="#order" class="btn btn--small">Записаться</a>
       </nav>
     </div>
     <div class="ornament" aria-hidden="true"></div>
@@ -63,7 +63,7 @@
         <h1>Ваш автомобиль<br>в надёжных руках</h1>
         <p class="hero__lead">Ремонт, диагностика и обслуживание с понятными ценами и гарантией на работы.</p>
         <div class="hero__actions">
-          <a href="#contacts" class="btn">Записаться на сервис</a>
+          <a href="#order" class="btn">Записаться на сервис</a>
           <a href="#services" class="btn btn--ghost">Наши услуги</a>
         </div>
       </div>
@@ -142,6 +142,62 @@
       </div>
     </section>
 
+    <!-- 5a. ЗАЯВКА НА СЕРВИС -->
+    <section class="section section--dark" id="order">
+      <div class="container">
+        <h2 class="section__title">Заявка на сервис</h2>
+        <p class="section__lead">Опишите, что нужно сделать с автомобилем, — мы свяжемся с вами и подтвердим время.</p>
+
+        <form class="order__form" id="order-form">
+          <div class="field">
+            <label for="f-name">Имя</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="100">
+          </div>
+          <div class="field">
+            <label for="f-phone">Телефон</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" required maxlength="30" placeholder="+7 (___) ___-__-__">
+          </div>
+          <div class="field field--wide">
+            <label for="f-email">Электронная почта</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="150">
+          </div>
+          <div class="field">
+            <label for="f-brand">Марка автомобиля</label>
+            <input id="f-brand" name="car_brand" type="text" required maxlength="60">
+          </div>
+          <div class="field">
+            <label for="f-model">Модель</label>
+            <input id="f-model" name="car_model" type="text" required maxlength="60">
+          </div>
+          <div class="field">
+            <label for="f-year">Год выпуска</label>
+            <input id="f-year" name="car_year" type="number" inputmode="numeric" min="1950" step="1" required>
+          </div>
+          <div class="field">
+            <label for="f-service">Услуга</label>
+            <select id="f-service" name="service" required>
+              <option value="" selected disabled>Выберите услугу</option>
+              <option value="repair">Ремонт</option>
+              <option value="diagnostics">Диагностика</option>
+              <option value="maintenance">Обслуживание</option>
+            </select>
+          </div>
+          <div class="field field--wide">
+            <label for="f-date">Желаемая дата</label>
+            <input id="f-date" name="preferred_date" type="date" required>
+          </div>
+          <div class="field field--wide">
+            <label for="f-desc">Описание проблемы</label>
+            <textarea id="f-desc" name="description" maxlength="2000" placeholder="Что случилось и когда началось"></textarea>
+          </div>
+          <div class="order__actions">
+            <button type="submit" class="btn" id="order-submit">Отправить заявку</button>
+            <p class="form__msg" id="order-msg" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <!-- 6. КОНТАКТЫ -->
     <section class="section section--light" id="contacts">
       <div class="container contacts">
@@ -170,6 +226,7 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>

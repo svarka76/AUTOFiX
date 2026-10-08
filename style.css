@@ -169,6 +169,32 @@ img.is-missing { visibility: hidden; }
 .contacts__list a { text-decoration: none; }
 .contacts__list a:hover { color: var(--red); }
 
+/* 11a. Форма заявки */
+.order__form {
+  margin-top: 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 20px;
+  padding: clamp(20px, 4vw, 36px); background: #fff; color: var(--text);
+  border-radius: var(--radius); border-bottom: 3px solid var(--gold);
+  box-shadow: 0 14px 30px rgba(0,0,0,.25);
+}
+.field { display: grid; gap: 6px; min-width: 0; }
+.field--wide { grid-column: 1 / -1; }
+.field label { font-size: .9rem; font-weight: 500; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 12px 14px; font: inherit; color: var(--text);
+  background: var(--paper); border: 1px solid #cfc9bb; border-radius: var(--radius);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+.field textarea { min-height: 110px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,.28);
+}
+.order__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.order__actions .btn { cursor: pointer; font: inherit; font-weight: 600; }
+.order__actions .btn:disabled { opacity: .6; cursor: progress; transform: none; }
+.form__msg { font-weight: 500; flex: 1 1 240px; }
+.form__msg--error { color: var(--red); }
+.form__msg--ok { color: var(--green); }
+
 /* 12. Подвал */
 .footer { background: var(--ink); color: rgba(255,255,255,.75); }
 .footer__inner { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; padding: 28px 0; }
@@ -474,6 +500,7 @@ img.is-missing { visibility: hidden; }
   }
   .nav.is-open { display: flex; }
   .contacts { grid-template-columns: 1fr; gap: 32px; }
+  .order__form { grid-template-columns: 1fr; }
   .gallery figure:first-child { grid-column: auto; }
 }
 

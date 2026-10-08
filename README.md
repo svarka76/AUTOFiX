@@ -8,7 +8,7 @@
 AUTOFiX/
 ├── index.html      — разметка страницы
 ├── style.css       — стили (цвета и размеры — в блоке :root вверху)
-├── script.js       — меню, поведение шапки
+├── script.js       — меню, поведение шапки, отправка заявки в Supabase
 ├── README.md
 └── assets/images/  — изображения сайта
 ```
@@ -36,6 +36,10 @@ AUTOFiX/
 1. Загрузите проект в репозиторий GitHub `AUTOFiX`.
 2. В Cloudflare Pages: Create project → Connect to Git → выберите репозиторий.
 3. Build command — пусто, Output directory — `/` (корень).
+
+## Заявки (Supabase)
+
+Форма «Заявка на сервис» пишет в таблицу `public.AUTOFiX`. В начале блока 5 в `script.js` вставьте `SUPABASE_URL` и `SUPABASE_ANON_KEY` (Supabase → Project Settings → API). Заявку может отправить только вошедший пользователь: `user_id` берётся из Supabase Auth, а не из формы. Защиту обеспечивает политика RLS на INSERT с проверкой `auth.uid() = user_id`.
 
 ## Что заменить
 
