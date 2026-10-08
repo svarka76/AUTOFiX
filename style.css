@@ -61,6 +61,8 @@ p { margin: 0; }
 .btn--small { padding: 9px 18px; }
 .btn--ghost { background: transparent; border-color: rgba(255,255,255,.6); }
 .btn--ghost:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+button.btn { font: inherit; font-weight: 600; cursor: pointer; }
+.is-hidden { display: none !important; }
 
 /* 5. Шапка */
 .header {
@@ -82,6 +84,13 @@ p { margin: 0; }
   background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform var(--ease);
 }
 .nav a:not(.btn):hover::after { transform: scaleX(1); }
+
+.auth { display: flex; align-items: center; gap: 10px; }
+.auth__guest, .auth__user { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.auth__email {
+  font-size: .85rem; color: rgba(255,255,255,.82);
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 .burger { display: none; background: none; border: 0; padding: 8px; cursor: pointer; }
 .burger span { display: block; width: 24px; height: 2px; background: #fff; margin: 5px 0; transition: transform var(--ease), opacity var(--ease); }
@@ -194,6 +203,34 @@ img.is-missing { visibility: hidden; }
 .form__msg { font-weight: 500; flex: 1 1 240px; }
 .form__msg--error { color: var(--red); }
 .form__msg--ok { color: var(--green); }
+.section--dark #order-auth-hint { margin-top: 12px; color: #f0b4b8; }
+
+/* 11b. Вход и регистрация */
+.auth-dialog {
+  width: min(440px, calc(100% - 32px));
+  padding: clamp(20px, 4vw, 28px);
+  border: 0;
+  border-radius: var(--radius);
+  border-bottom: 3px solid var(--gold);
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 14px 30px rgba(0,0,0,.25);
+}
+.auth-dialog::backdrop { background: rgba(21,25,27,.72); }
+.auth-dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.auth-dialog__title { font-size: 1.25rem; }
+.auth-dialog__close {
+  width: 36px; height: 36px; border: 0; background: transparent;
+  font-size: 1.6rem; line-height: 1; color: var(--muted); cursor: pointer;
+}
+.auth-dialog__close:hover { color: var(--red); }
+.auth-dialog__tabs { display: flex; gap: 8px; margin: 18px 0 20px; }
+.auth-dialog__tab {
+  flex: 1; padding: 10px 12px; font: inherit; font-weight: 600; cursor: pointer;
+  color: var(--muted); background: var(--paper); border: 1px solid #cfc9bb; border-radius: var(--radius);
+}
+.auth-dialog__tab.is-active { color: #fff; background: var(--green); border-color: var(--green); }
+.auth-dialog__form { display: grid; gap: 16px; }
 
 /* 12. Подвал */
 .footer { background: var(--ink); color: rgba(255,255,255,.75); }
@@ -463,6 +500,10 @@ img.is-missing { visibility: hidden; }
   background: linear-gradient(90deg, rgba(21,25,27,.35) 0%, rgba(21,25,27,0) 60%);
 }
 
+@media (max-width: 1100px) {
+  .nav { gap: 16px; }
+}
+
 /* Планшет: рисунок hero уменьшается и уходит вниз справа */
 @media (max-width: 1000px) {
   .hero__ph-stage { width: min(52vw, 460px); bottom: 4%; }
@@ -499,6 +540,8 @@ img.is-missing { visibility: hidden; }
     display: none;
   }
   .nav.is-open { display: flex; }
+  .auth, .auth__guest, .auth__user { width: 100%; }
+  .auth__email { max-width: 100%; }
   .contacts { grid-template-columns: 1fr; gap: 32px; }
   .order__form { grid-template-columns: 1fr; }
   .gallery figure:first-child { grid-column: auto; }
