@@ -43,8 +43,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
 // 5. Заявка на сервис → Supabase
 //    Вставьте адрес проекта и публичный (anon) ключ: Supabase → Project Settings → API.
 //    anon-ключ публичный по замыслу, доступ к данным ограничивает RLS.
-const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+const SUPABASE_URL = 'https://hzzglbgrgcxwhvtumoax.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_g0lr_8L1JciriuketB_GEA_-QpQSsjT';
 const ORDERS_TABLE = 'AUTOFiX';
 
 const sb = (window.supabase && !SUPABASE_URL.includes('YOUR-') && !SUPABASE_ANON_KEY.includes('YOUR-'))
