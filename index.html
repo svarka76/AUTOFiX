@@ -27,6 +27,16 @@
         <a href="#gallery">Галерея</a>
         <a href="#contacts">Контакты</a>
         <a href="#order" class="btn btn--small">Записаться</a>
+        <div class="auth" id="auth-bar">
+          <div class="auth__guest" id="auth-guest">
+            <button type="button" class="btn btn--ghost btn--small" id="auth-open-login">Войти</button>
+            <button type="button" class="btn btn--small" id="auth-open-register">Регистрация</button>
+          </div>
+          <div class="auth__user is-hidden" id="auth-user">
+            <span class="auth__email" id="auth-email"></span>
+            <button type="button" class="btn btn--ghost btn--small" id="auth-logout">Выйти</button>
+          </div>
+        </div>
       </nav>
     </div>
     <div class="ornament" aria-hidden="true"></div>
@@ -147,6 +157,7 @@
       <div class="container">
         <h2 class="section__title">Заявка на сервис</h2>
         <p class="section__lead">Опишите, что нужно сделать с автомобилем, — мы свяжемся с вами и подтвердим время.</p>
+        <p class="form__msg form__msg--error" id="order-auth-hint" hidden>Чтобы отправить заявку, войдите в аккаунт или зарегистрируйтесь — кнопки вверху справа.</p>
 
         <form class="order__form" id="order-form">
           <div class="field">
@@ -225,6 +236,51 @@
       <p>© <span id="year">2026</span> AUTOFiX. Все права защищены.</p>
     </div>
   </footer>
+
+  <dialog class="auth-dialog" id="auth-dialog" aria-labelledby="auth-dialog-title">
+    <div class="auth-dialog__head">
+      <h2 class="auth-dialog__title" id="auth-dialog-title">Вход</h2>
+      <button type="button" class="auth-dialog__close" id="auth-dialog-close" aria-label="Закрыть">×</button>
+    </div>
+    <div class="auth-dialog__tabs">
+      <button type="button" class="auth-dialog__tab is-active" id="auth-tab-login">Войти</button>
+      <button type="button" class="auth-dialog__tab" id="auth-tab-register">Регистрация</button>
+    </div>
+
+    <form class="auth-dialog__form" id="login-form">
+      <div class="field field--wide">
+        <label for="login-email">Электронная почта</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" required maxlength="150">
+      </div>
+      <div class="field field--wide">
+        <label for="login-password">Пароль</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="6">
+      </div>
+      <div class="order__actions">
+        <button type="submit" class="btn" id="login-submit">Войти</button>
+        <p class="form__msg" id="login-msg" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <form class="auth-dialog__form is-hidden" id="register-form">
+      <div class="field field--wide">
+        <label for="register-email">Электронная почта</label>
+        <input id="register-email" name="email" type="email" autocomplete="email" required maxlength="150">
+      </div>
+      <div class="field field--wide">
+        <label for="register-password">Пароль</label>
+        <input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="6">
+      </div>
+      <div class="field field--wide">
+        <label for="register-password2">Повторите пароль</label>
+        <input id="register-password2" name="password2" type="password" autocomplete="new-password" required minlength="6">
+      </div>
+      <div class="order__actions">
+        <button type="submit" class="btn" id="register-submit">Зарегистрироваться</button>
+        <p class="form__msg" id="register-msg" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
