@@ -1,4 +1,3 @@
-```javascript
 // ============================================
 // AUTOFiX — основной JavaScript
 // ============================================
@@ -121,7 +120,7 @@ const authDialogTitle =
   document.getElementById('auth-dialog-title');
 
 const authClose =
-  document.getElementById('auth-close');
+  document.getElementById('auth-dialog-close');
 
 const loginForm =
   document.getElementById('login-form');
@@ -180,7 +179,7 @@ function authErrorMessage(error, context) {
   if (
     message.includes('password should be at least')
   ) {
-    return 'Пароль должен содержать минимум 8 символов.';
+    return 'Пароль слишком короткий. Минимум 6 символов.';
   }
 
   if (
@@ -250,10 +249,7 @@ function setAuthView(user) {
   }
 
   if (authHint) {
-    authHint.classList.toggle(
-      'is-hidden',
-      !!user
-    );
+    authHint.hidden = !!user;
   }
 }
 
@@ -309,6 +305,7 @@ function openAuthDialog(mode) {
   if (!authDialog) return;
 
   showAuthPanel(mode);
+  setMenu(false);
 
   if (typeof authDialog.showModal === 'function') {
     authDialog.showModal();
@@ -520,7 +517,7 @@ if (registerForm) {
 
       const passwordConfirm =
         String(
-          formData.get('password_confirm') || ''
+          formData.get('password2') || ''
         );
 
       if (password !== passwordConfirm) {
@@ -531,9 +528,9 @@ if (registerForm) {
         return;
       }
 
-      if (password.length < 8) {
+      if (password.length < 6) {
         showRegisterMessage(
-          'Пароль должен содержать минимум 8 символов.',
+          'Пароль должен содержать минимум 6 символов.',
           'error'
         );
         return;
@@ -554,7 +551,10 @@ if (registerForm) {
           error
         } = await sb.auth.signUp({
           email,
-          password
+          password,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
         });
 
         if (error) {
@@ -659,13 +659,11 @@ if (sb) {
   );
 
   sb.auth
-    .getUser()
-    .then(({ data, error }) => {
-      if (!error) {
-        setAuthView(
-          data?.user || null
-        );
-      }
+    .getSession()
+    .then(({ data }) => {
+      setAuthView(
+        data?.session?.user || null
+      );
     })
     .catch(() => {
       setAuthView(null);
@@ -859,4 +857,3 @@ if (orderForm) {
     }
   );
 }
-```
