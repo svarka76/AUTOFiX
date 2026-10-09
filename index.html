@@ -159,7 +159,7 @@
         <p class="section__lead">Опишите, что нужно сделать с автомобилем, — мы свяжемся с вами и подтвердим время.</p>
         <p class="form__msg form__msg--error" id="order-auth-hint" hidden>Чтобы отправить заявку, войдите в аккаунт или зарегистрируйтесь — кнопки вверху справа.</p>
 
-        <form class="order__form" id="order-form">
+        <form class="order__form" id="order-form" novalidate>
           <div class="field">
             <label for="f-name">Имя</label>
             <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="100">
@@ -193,7 +193,15 @@
               <option value="maintenance">Обслуживание</option>
             </select>
           </div>
-          <div class="field field--wide">
+          <div class="field">
+            <label for="f-plate">Государственный номер автомобиля</label>
+            <input id="f-plate" name="license_plate" type="text" required maxlength="14"
+                   autocomplete="off" autocapitalize="characters" spellcheck="false"
+                   placeholder="А123ВС777" aria-describedby="plate-hint plate-error">
+            <small class="field__hint" id="plate-hint">Например: А123ВС777. Только русские буквы.</small>
+            <p class="field__error" id="plate-error" role="alert" hidden></p>
+          </div>
+          <div class="field">
             <label for="f-date">Желаемая дата</label>
             <input id="f-date" name="preferred_date" type="date" required>
           </div>

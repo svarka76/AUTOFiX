@@ -180,7 +180,7 @@ img.is-missing { visibility: hidden; }
   border-radius: var(--radius); border-bottom: 3px solid var(--gold);
   box-shadow: 0 14px 30px rgba(0,0,0,.25);
 }
-.field { display: grid; gap: 6px; min-width: 0; }
+.field { display: grid; align-content: start; gap: 6px; min-width: 0; }
 .field--wide { grid-column: 1 / -1; }
 .field label { font-size: .9rem; font-weight: 500; }
 .field input, .field select, .field textarea {
@@ -189,6 +189,11 @@ img.is-missing { visibility: hidden; }
   transition: border-color var(--ease), box-shadow var(--ease);
 }
 .field textarea { min-height: 110px; resize: vertical; }
+.field__hint { font-size: .8rem; line-height: 1.4; color: var(--muted); }
+.field__error { font-size: .85rem; line-height: 1.4; font-weight: 500; color: var(--red); }
+.field input[aria-invalid="true"] { border-color: var(--red); box-shadow: 0 0 0 3px rgba(179,32,42,.16); }
+.field input[name="license_plate"] { text-transform: uppercase; letter-spacing: .06em; }
+.field input[name="license_plate"]::placeholder { text-transform: none; letter-spacing: normal; }
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,.28);
 }

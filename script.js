@@ -728,10 +728,104 @@ if (orderForm) {
   }
 
 
+  // ---------- Государственный номер ----------
+  // Допустимые буквы: А В Е К М Н О Р С Т У Х (кириллица).
+  // Формат: буква, 3 цифры, 2 буквы, регион из 2 или 3 цифр.
+  // То же правило записано в CHECK-ограничении в PostgreSQL.
+  const PLATE_RE =
+    /^[АВЕКМНОРСТУХ][0-9]{3}[АВЕКМНОРСТУХ]{2}[0-9]{2,3}$/;
+
+  const plateInput =
+    document.getElementById('f-plate');
+
+  const plateError =
+    document.getElementById('plate-error');
+
+  // Удаляем пробелы и приводим к верхнему регистру.
+  // Латиницу в кириллицу НЕ заменяем.
+  function normalizePlate(value) {
+    return String(value || '')
+      .replace(/\s+/g, '')
+      .toUpperCase();
+  }
+
+  // Возвращает текст ошибки или '' если номер корректен
+  function plateProblem(plate) {
+    if (!plate) {
+      return 'Введите государственный номер автомобиля.';
+    }
+
+    if (/[A-Za-z]/.test(plate)) {
+      return 'Используйте русские буквы (А, В, Е, К, М, Н, О, Р, С, Т, У, Х), латинские не подходят.';
+    }
+
+    if (!PLATE_RE.test(plate)) {
+      return 'Неверный формат номера. Пример: А123ВС777 — буква, 3 цифры, 2 буквы и регион (2–3 цифры). Допустимые буквы: А, В, Е, К, М, Н, О, Р, С, Т, У, Х.';
+    }
+
+    return '';
+  }
+
+  function showPlateError(text) {
+    if (!plateInput || !plateError) return;
+
+    plateError.textContent = text;
+    plateError.hidden = !text;
+
+    if (text) {
+      plateInput.setAttribute('aria-invalid', 'true');
+    } else {
+      plateInput.removeAttribute('aria-invalid');
+    }
+  }
+
+  if (plateInput) {
+    // После ухода из поля показываем нормализованный вид.
+    // Ошибку здесь НЕ показываем: она сдвинула бы кнопку «Отправить»
+    // раньше, чем завершится клик по ней. Ошибка появляется при отправке.
+    plateInput.addEventListener('blur', () => {
+      plateInput.value =
+        normalizePlate(plateInput.value);
+    });
+
+    // Пока пользователь исправляет — убираем старую ошибку
+    plateInput.addEventListener('input', () => {
+      if (!plateError.hidden) {
+        showPlateError('');
+      }
+    });
+  }
+
+
   orderForm.addEventListener(
     'submit',
     async (event) => {
       event.preventDefault();
+
+      // Проверка номера до остальных проверок и до отправки
+      const plate =
+        normalizePlate(
+          plateInput ? plateInput.value : ''
+        );
+
+      const plateMessage = plateProblem(plate);
+
+      if (plateMessage) {
+        showPlateError(plateMessage);
+
+        if (plateInput) {
+          plateInput.focus();
+        }
+
+        showOrderMessage('', '');
+        return;
+      }
+
+      showPlateError('');
+
+      if (plateInput) {
+        plateInput.value = plate;
+      }
 
       if (!orderForm.reportValidity()) {
         return;
@@ -792,6 +886,7 @@ if (orderForm) {
             text('car_year'),
             10
           ),
+          license_plate: plate,
           service: text('service'),
           description: text('description'),
           preferred_date:
@@ -818,6 +913,20 @@ if (orderForm) {
 
 
         if (error) {
+          if (
+            error.code === '23514' &&
+            /license_plate/i.test(
+              error.message || ''
+            )
+          ) {
+            showPlateError(
+              'Сервер не принял номер. Проверьте формат: А123ВС777.'
+            );
+            showOrderMessage('', '');
+            if (plateInput) plateInput.focus();
+            return;
+          }
+
           const denied =
             error.code === '42501' ||
             /row-level security/i.test(
@@ -837,6 +946,7 @@ if (orderForm) {
 
 
         orderForm.reset();
+        showPlateError('');
 
 
         showOrderMessage(
